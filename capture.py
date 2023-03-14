@@ -1,34 +1,36 @@
 #!/usr/bin/env python3
+
 import subprocess
 import time
-from gpiozero import MotionSensor, DistanceSensor
+from gpiozero import MotionSensor, DistanceSensor, LED
 
-# initialize the motion sensor
+# Initialize the motion sensor
 pir = MotionSensor(4)
-# initialize the ultrasonic sensor
+
+# Initialize the ultrasonic sensor
 ultrasonic = DistanceSensor(echo=4, trigger=5)
-def take_picture(filename):
-    test = subprocess.Popen([
-        "gphoto2",
-        "--capture-image-and-download",
-        "--filename", "/home/pi/Photos/"+filename],
-        stdout=subprocess.PIPE)
-    # run the subprocess and capture standard output
-    output = test.communicate()[0]
-    # print any messages for debugging
-    print(output)
+
+# Initialize the LED
+led = LED(17)
+
+# Define function to take picture
+def take_picture():
+    led.on()  # Turn on the LED
+    subprocess.call(["gphoto2", "--capture-image"])
+    led.off()  # Turn off the LED
+
 if __name__ == '__main__':
-    # determine if the sensor was activated
-    # pir.wait_for_motion()
+    # Main program loop
     while True:
-        # get the distance reading from the sensor distance
+        # Get the distance reading from the ultrasonic sensor
         distance = ultrasonic.distance * 100
+        # Print distance for debugging
         print('Distance: ', distance)
-        # take the picture if something is close enough
+        # Take the picture if something is close enough
         if distance < 10:
-            # set the filename to the current time
-            filename = time.strftime("%Y%M%D-%H%M%S.JPG")
-            # TAKE THE PICTURE
-            take_picture(filename)
+            # Take the picture
+            take_picture()
+            # Break out of loop
             break
+        # Wait for 1 second before checking again
         time.sleep(1)
