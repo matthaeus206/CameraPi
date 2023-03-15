@@ -24,16 +24,24 @@ def take_picture_and_flash():
 
 if __name__ == '__main__':
     # Main program loop
-    while True:
-        # Get the distance reading from the ultrasonic sensor
-        distance = ultrasonic.distance * 100
-        # Print distance for debugging
-        print('Distance: ', distance)
-        # Take the picture and trigger the flash if something is close enough
-        if distance < 10:
-            # Take the picture and trigger the flash
-            take_picture_and_flash()
-            # Break out of loop
-            break
-        # Wait for 1 second before checking again
-        time.sleep(1)
+    try:
+        while True:
+            # Get the distance reading from the ultrasonic sensor
+            distance = ultrasonic.distance * 100
+            # Print distance for debugging
+            print('Distance: ', distance)
+            # Take the picture and trigger the flash if something is close enough
+            if distance < 10:
+                # Take the picture and trigger the flash
+                take_picture_and_flash()
+                # Break out of loop
+                break
+            # Wait for 1 second before checking again
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("Program terminated by user")
+    finally:
+        # Clean up GPIO resources
+        pir.close()
+        ultrasonic.close()
+        led.close()
