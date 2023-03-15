@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+import subprocess
+import time
+from libcamera import Camera, Control, Stream
+from gpiozero import MotionSensor, DigitalOutputDevice
+
+# Initialize the motion sensor and flash trigger
+pir = MotionSensor(4)
+flash_trigger = DigitalOutputDevice(2)
+
+def take_picture(filename):
+    with Camera() as camera:
+        # Configure the camera settings
+        camera.controls['exposure'].value = 5000  # Set exposure to 5ms
+        camera.controls['brightness'].value = 50  # Set brightness to 50%
+        # Trigger the flash by setting the output high
+        flash_trigger.on()
+        # Capture an image and save it to the specified filename
+        with camera.capture(Stream()) as stream:
+            stream.save(filename)
+        # Wait for a short period to ensure the flash has time to fire
+        time.sleep(0.5)
+        # Turn off the flash trigger
+        flash_trigger.off()
+
+if __name__ == '__main__':
+    while True:
+        # Take a picture if the PIR sensor is activated
+        if pir.motion_detected:
+            # Set the filename to the current time
+            filename = time.strftime("%Y%m%d-%H%M%S.jpg")
+            # Take the picture
+            take_picture(filename)
+            break
+        time.sleep(1)
