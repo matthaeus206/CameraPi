@@ -1,0 +1,43 @@
+                         +----------------------+
+                         |       Raspberry Pi    |
+                         |                      |
+                         |        3.3V (Pin 1)  | 
+                         |        GND  (Pin 6)  | 
+                         |                      |
+                         |         GPIO4 (Pin 7) |--------> PIR sensor OUT
+                         |         GPIO5 (Pin 29)|--------> Ultrasonic sensor TRIG
+                         |         GPIO17(Pin 11)|--------> LED anode
+                         |         GPIO27(Pin 13)|--------> Flash trigger
+                         +----------------------+
+
+            +---------------------------+  +---------------------------+
+            |          PIR Sensor        |  |        Ultrasonic Sensor   |
+            |                           |  |                           |
+            |             +---------+   |  |    +-----------------+    |
+            |             |         |   |  |    |                 |    |
+            +----OUT------+   NPN   |   |  |    |          +------TRIG----->GPIO5
+                          | Transis |   |  |    |          |      |    |
+                          |  tor    |---+  |    |          |      |    |
+                          |         |      |    |          |      |    |
+                          +----GND--+      |    |          |      |    |
+                                         |    |          +------+    |
+                                         |    |  GND                GND
+                                         |    +---------------------+
+                                         |
+                                         +------VCC----220 Ohm Resistor--+----GPIO17
+                                         |                              |
+                                         +------GND                       |
+                                                                         |
+                                  1K Ohm Resistor                        |
+                                  +-------------------------+           |
+                                  |                         |           |
+                     GND----------+ Base                  |           |
+                                  |                    Emitter        |
+                                  |                         |           |
+                                  +----GPIO27----220 Ohm Resistor+-----FLASH TRIGGER
+                                                                       |
+                                                                       |
+                                                      1K Ohm Resistor  |
+                                                      +----------------+
+                                                      |
+                                                     GND
