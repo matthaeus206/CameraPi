@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-
 import subprocess
 import time
-from gpiozero import MotionSensor, DistanceSensor, LED
+from gpiozero import MotionSensor, DistanceSensor, LED, OutputDevice
 
 # Initialize the motion sensor
 pir = MotionSensor(4)
@@ -13,8 +11,16 @@ ultrasonic = DistanceSensor(echo=4, trigger=5)
 # Initialize the LED
 led = LED(17)
 
+# Initialize the flash trigger
+flash = OutputDevice(27, active_high=False)
+
 # Define function to take picture and trigger flash
 def take_picture_and_flash():
+    # Trigger the flash
+    flash.on()
+    time.sleep(0.05)  # Flash duration
+    flash.off()
+    # Take the picture
     led.on()  # Turn on the LED
     subprocess.call(["gphoto2", "--trigger-capture"])
     time.sleep(0.01)  # Wait for camera to start exposure
@@ -45,3 +51,4 @@ if __name__ == '__main__':
         pir.close()
         ultrasonic.close()
         led.close()
+        flash.close()
