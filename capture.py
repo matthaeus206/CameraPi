@@ -13,10 +13,13 @@ ultrasonic = DistanceSensor(echo=4, trigger=5)
 # Initialize the LED
 led = LED(17)
 
-# Define function to take picture
-def take_picture():
+# Define function to take picture and trigger flash
+def take_picture_and_flash():
     led.on()  # Turn on the LED
-    subprocess.call(["gphoto2", "--capture-image"])
+    subprocess.call(["gphoto2", "--trigger-capture"])
+    time.sleep(0.01)  # Wait for camera to start exposure
+    shutter_speed = float(subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1])
+    time.sleep(shutter_speed * (299/300))  # Wait for the last 1/300 of exposure time
     led.off()  # Turn off the LED
 
 if __name__ == '__main__':
@@ -26,10 +29,10 @@ if __name__ == '__main__':
         distance = ultrasonic.distance * 100
         # Print distance for debugging
         print('Distance: ', distance)
-        # Take the picture if something is close enough
+        # Take the picture and trigger the flash if something is close enough
         if distance < 10:
-            # Take the picture
-            take_picture()
+            # Take the picture and trigger the flash
+            take_picture_and_flash()
             # Break out of loop
             break
         # Wait for 1 second before checking again
