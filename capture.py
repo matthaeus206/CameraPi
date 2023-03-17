@@ -5,7 +5,7 @@ from gpiozero import MotionSensor, DistanceSensor, LED, OutputDevice
 # Initialize the motion sensor
 pir = MotionSensor(4)
 
-# Initialize the ultrasonic sensor
+# Initialize the ultrasonic sensor minimum recharge time is 0.5sec
 ultrasonic = DistanceSensor(echo=4, trigger=5)
 
 # Initialize the LED
@@ -43,7 +43,7 @@ if __name__ == '__main__':
                 # Break out of loop
                 break
             # Wait for 1 second before checking again
-            time.sleep(1)
+            time.sleep(0.5)
     except KeyboardInterrupt:
         print("Program terminated by user")
     finally:
