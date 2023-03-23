@@ -1,0 +1,15 @@
+import RPi.GPIO as GPIO
+import time
+
+# Set up the GPIO pin
+GPIO.setmode(GPIO.BOARD)
+flash_pin = 18
+GPIO.setup(flash_pin, GPIO.OUT)
+
+# Trigger the flash
+GPIO.output(flash_pin, GPIO.HIGH)
+time.sleep(0.1)
+GPIO.output(flash_pin, GPIO.LOW)
+
+# Clean up the GPIO
+GPIO.cleanup()
