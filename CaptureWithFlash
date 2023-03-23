@@ -1,7 +1,7 @@
 import subprocess
 import time
-from gpiozero import MotionSensor, DistanceSensor, LED
 import RPi.GPIO as GPIO
+from gpiozero import MotionSensor, DistanceSensor, LED
 
 # Initialize the motion sensor
 pir = MotionSensor(4)
@@ -12,45 +12,43 @@ ultrasonic = DistanceSensor(echo=4, trigger=5)
 # Initialize the LED
 led = LED(17)
 
-# Set up the GPIO pin for the flash trigger
-GPIO.setmode(GPIO.BOARD)
+# Initialize the GPIO pin for the flash
 flash_pin = 18
+GPIO.setmode(GPIO.BCM)
 GPIO.setup(flash_pin, GPIO.OUT)
 
 # Define function to take picture and trigger flash
 def take_picture():
-    # Take the picture
-    led.on()  # Turn on the LED
-    subprocess.call(["gphoto2", "--trigger-capture"])
-    time.sleep(0.01)  # Wait for camera to start exposure
-    shutter_speed = float(subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1])
-    led.off()  # Turn off the LED
-    
-    # Trigger the flash
-    GPIO.output(flash_pin, GPIO.HIGH)  # Trigger the flash
-    time.sleep(0.001)  # Wait for 1ms (1/1000 sec)
-    GPIO.output(flash_pin, GPIO.LOW)  # Turn off the flash
-    time.sleep(shutter_speed * (299/300))  # Wait for the last 1/300 of exposure time
+    while True:
+        # Turn on the LED
+        led.on()
+
+        # Trigger the camera shutter
+        subprocess.call(["gphoto2", "--trigger-capture"])
+
+        # Wait for the camera to start exposure
+        time.sleep(0.01)
+
+        # Trigger the flash
+        GPIO.output(flash_pin, GPIO.HIGH)
+
+        # Wait for the last 1/300 of exposure time
+        shutter_speed = float(subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1])
+        time.sleep(shutter_speed * (299/300))
+
+        # Turn off the LED and flash
+        led.off()
+        GPIO.output(flash_pin, GPIO.LOW)
+
+        # Wait for one second before taking the next picture
+        time.sleep(1)
 
 if __name__ == '__main__':
-    # Main program loop
-    try:
-        while True:
-            # Get the distance reading from the ultrasonic sensor
-            distance = ultrasonic.distance * 100
-            # Print distance for debugging
-            print('Distance: ', distance)
-            # Take the picture if something is close enough and there is motion detected
-            if distance < 10 and pir.motion_detected:
-                # Take the picture and trigger flash
-                take_picture()
-            # Wait for 1 second before checking again
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print("Program terminated by user")
-    finally:
-        # Clean up GPIO resources
-        pir.close()
-        ultrasonic.close()
-        led.close()
-        GPIO.cleanup()
+    # Call the take_picture function
+    take_picture()
+
+    # Clean up GPIO resources
+    pir.close()
+    ultrasonic.close()
+    led.close()
+    GPIO.cleanup()
