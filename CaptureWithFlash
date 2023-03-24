@@ -29,16 +29,23 @@ def take_picture():
         # Wait for the camera to start exposure
         time.sleep(0.01)
 
-        # Trigger the flash
-        GPIO.output(flash_pin, GPIO.HIGH)
-
-        # Wait for the last 1/300 of exposure time
+        # Check the shutter speed
         shutter_speed = float(subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1])
-        time.sleep(shutter_speed * (299/300))
 
-        # Turn off the LED and flash
+        if shutter_speed < 1/300:
+            # Trigger the flash at the beginning of the exposure
+            GPIO.output(flash_pin, GPIO.HIGH)
+            time.sleep(shutter_speed)
+            GPIO.output(flash_pin, GPIO.LOW)
+        else:
+            # Trigger the flash near the end of the exposure
+            time.sleep(shutter_speed * (299/300))
+            GPIO.output(flash_pin, GPIO.HIGH)
+            time.sleep(shutter_speed * (1/300))
+            GPIO.output(flash_pin, GPIO.LOW)
+
+        # Turn off the LED
         led.off()
-        GPIO.output(flash_pin, GPIO.LOW)
 
         # Wait for one second before taking the next picture
         time.sleep(1)
