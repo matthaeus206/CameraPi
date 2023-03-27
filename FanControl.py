@@ -1,7 +1,8 @@
-from gpiozero import PWMOutputDevice
 import os
 import glob
 import time
+from gpiozero import PWMOutputDevice
+import RPi.GPIO as GPIO
 
 # Set the pin number to which the fan is connected
 FAN_PIN = 18
@@ -14,6 +15,10 @@ MAX_TEMP = 85
 
 # Set the delay between temperature readings (in seconds)
 DELAY_TIME = 5
+
+# Set the minimum and maximum duty cycles for the fan (0 to 1)
+MIN_DUTY_CYCLE = 0.2
+MAX_DUTY_CYCLE = 1.0
 
 # Initialize the fan and set its initial speed to 0 (off)
 fan = PWMOutputDevice(FAN_PIN)
@@ -39,15 +44,23 @@ def read_temperature():
         temp_c = float(temp_string) / 1000.0
         return temp_c
 
+# Function to set the fan speed based on the CPU temperature
+def set_fan_speed():
+    temperature = read_temperature()
+    duty_cycle = (MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) * ((temperature - TEMP_THRESHOLD) / (MAX_TEMP - TEMP_THRESHOLD)) + MIN_DUTY_CYCLE
+    duty_cycle = min(max(duty_cycle, MIN_DUTY_CYCLE), MAX_DUTY_CYCLE)  # Ensure duty cycle is between MIN and MAX
+    fan.value = duty_cycle
+
 # Function to put the Raspberry Pi into standby mode
 def standby_mode():
+    GPIO.cleanup()
     os.system('sudo systemctl suspend')
 
-# Main loop to read the temperature and control the fan
+# Main loop to read the temperature, control the fan, and check for standby mode
 while True:
     temperature = read_temperature()
     if temperature >= TEMP_THRESHOLD:
-        fan.value = 1
+        set_fan_speed()
     else:
         fan.value = 0
     if temperature >= MAX_TEMP:
