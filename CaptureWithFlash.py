@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 from gpiozero import MotionSensor, DistanceSensor, LED
 
 # Initialize the motion sensor
-pir = MotionSensor(4)
+pir = MotionSensor(6)
 
 # Initialize the ultrasonic sensor minimum recharge time is 0.5sec
 ultrasonic = DistanceSensor(echo=4, trigger=5)
@@ -23,14 +23,21 @@ def take_picture():
         # Turn on the LED
         led.on()
 
-        # Trigger the camera shutter
-        subprocess.call(["gphoto2", "--trigger-capture"])
+        # Try to trigger the camera shutter
+        try:
+            subprocess.call(["gphoto2", "--trigger-capture"])
+        except subprocess.CalledProcessError:
+            print("Could not trigger camera shutter")
 
         # Wait for the camera to start exposure
         time.sleep(0.01)
 
-        # Check the shutter speed
-        shutter_speed = float(subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1])
+        # Try to get the shutter speed
+        try:
+            shutter_speed = float(subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1])
+        except (subprocess.CalledProcessError, ValueError):
+            print("Could not get shutter speed")
+            shutter_speed = 0
 
         if shutter_speed < 1/300:
             # Trigger the flash at the beginning of the exposure
