@@ -1,20 +1,19 @@
-import os
 import glob
 import time
-import RPi.GPIO as GPIO
+import pigpio
 
-# Set up GPIO pins
-GPIO.setmode(GPIO.BOARD)
+# Set up pigpio
+pi = pigpio.pi()
 
 # Set up HC-SR501
 PIR_PIN = 7
-GPIO.setup(PIR_PIN, GPIO.IN)
+pi.set_mode(PIR_PIN, pigpio.INPUT)
 
 # Set up HC-SR04
 TRIG_PIN = 11
 ECHO_PIN = 12
-GPIO.setup(TRIG_PIN, GPIO.OUT)
-GPIO.setup(ECHO_PIN, GPIO.IN)
+pi.set_mode(TRIG_PIN, pigpio.OUTPUT)
+pi.set_mode(ECHO_PIN, pigpio.INPUT)
 
 # Function to read DSD18B20 sensor
 def read_ds18b20():
@@ -34,7 +33,7 @@ def read_ds18b20():
                 else:
                     continue
         except KeyboardInterrupt:
-            GPIO.cleanup()
+            pi.stop()
             exit()
         except:
             continue
@@ -43,9 +42,9 @@ def read_ds18b20():
 def read_hcsr501():
     while True:
         try:
-            return GPIO.input(PIR_PIN)
+            return pi.read(PIR_PIN)
         except KeyboardInterrupt:
-            GPIO.cleanup()
+            pi.stop()
             exit()
         except:
             continue
@@ -54,22 +53,22 @@ def read_hcsr501():
 def read_hcsr04():
     while True:
         try:
-            GPIO.output(TRIG_PIN, False)
+            pi.write(TRIG_PIN, 0)
             time.sleep(0.1)
-            GPIO.output(TRIG_PIN, True)
+            pi.write(TRIG_PIN, 1)
             time.sleep(0.00001)
-            GPIO.output(TRIG_PIN, False)
+            pi.write(TRIG_PIN, 0)
 
-            while GPIO.input(ECHO_PIN)==0:
+            while pi.read(ECHO_PIN)==0:
                 pulse_start = time.time()
-            while GPIO.input(ECHO_PIN)==1:
+            while pi.read(ECHO_PIN)==1:
                 pulse_end = time.time()
 
             pulse_duration = pulse_end - pulse_start
             distance = pulse_duration * 17150
             return distance
         except KeyboardInterrupt:
-            GPIO.cleanup()
+            pi.stop()
             exit()
         except:
             continue
@@ -90,7 +89,7 @@ while True:
         # Wait for next iteration
         time.sleep(1)
     except KeyboardInterrupt:
-        GPIO.cleanup()
+        pi.stop()
         exit()
     except:
         continue
