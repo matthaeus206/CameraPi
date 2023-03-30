@@ -1,43 +1,28 @@
 import time
 import pigpio
+from gpiozero import DistanceSensor
 
-# initialize pigpio
+# Initialize the distance sensor
+ultrasonic = DistanceSensor(echo=4, trigger=5)
+
+# Initialize pigpio
 pi = pigpio.pi()
 
-# define GPIO pins
-echo_pin = 4
-trigger_pin = 5
+# Define a callback function to print the distance of the object
+def cb_echo(gpio, level, tick):
+    distance = ultrasonic.distance * 100 # convert to centimeters
+    print(f"Distance: {distance:.2f} cm")
 
-# set trigger pin as output and echo pin as input
-pi.set_mode(trigger_pin, pigpio.OUTPUT)
-pi.set_mode(echo_pin, pigpio.INPUT)
+# Add a callback to the echo pin
+cb = pi.callback(ultrasonic.echo_pin, pigpio.EITHER_EDGE, cb_echo)
 
-# set trigger pin to low
-pi.write(trigger_pin, 0)
+try:
+    # Keep the script running indefinitely
+    while True:
+        time.sleep(1)
 
-# wait for the sensor to settle
-time.sleep(2)
-
-# send 10us pulse to trigger pin
-pi.write(trigger_pin, 1)
-time.sleep(0.00001)
-pi.write(trigger_pin, 0)
-
-# wait for echo pin to go high
-start_time = time.time()
-while pi.read(echo_pin) == 0:
-    start_time = time.time()
-
-# wait for echo pin to go low
-stop_time = time.time()
-while pi.read(echo_pin) == 1:
-    stop_time = time.time()
-
-# calculate distance
-elapsed_time = stop_time - start_time
-distance = (elapsed_time * 34300) / 2
-
-print(f"Distance: {distance:.2f} cm")
-
-# cleanup
-pi.stop()
+except KeyboardInterrupt:
+    # Clean up resources on keyboard interrupt
+    cb.cancel()
+    pi.stop()
+    ultrasonic.close()
