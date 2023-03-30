@@ -1,4 +1,5 @@
 import subprocess
+import re
 import time
 
 while True:
@@ -15,8 +16,9 @@ while True:
         print("Warning: overtemperature detected!")
 
     # Check for high CPU usage
-    cpu_output = subprocess.check_output(['top', '-n', '1'])
-    cpu_usage = float(cpu_output.decode().split('Cpu(s):')[1].split('us')[0].strip())
+    cpu_output = subprocess.check_output(['top', '-bn1'])
+    cpu_usage_str = re.search(r'%Cpu\(s\):.*?(\d+\.\d+) us', cpu_output.decode(), flags=re.DOTALL).group(1)
+    cpu_usage = float(cpu_usage_str)
     if cpu_usage > 90.0:
         print("Warning: high CPU usage detected!")
 
