@@ -5,11 +5,6 @@ while True:
     if open('/sys/devices/platform/soc/soc:firmware/get_throttled').read().split()[0] != '0':
         print("Lightning bolt symbol detected")
 
-    # Check for blinking red LED
-    with open('/sys/class/leds/led0/trigger', 'r') as trigger_file:
-        if trigger_file.read().strip() == "timer":
-            print("Blinking red LED detected")
-
     # Check for instability or crashes
     print("If the Raspberry Pi is freezing or crashing frequently, it may be a sign of undervoltage.")
 
