@@ -7,15 +7,17 @@ pi = pigpio.pi()
 pi.set_mode(pir_pin, pigpio.INPUT)
 pi.set_pull_up_down(pir_pin, pigpio.PUD_DOWN)
 
-# Get the current sensitivity, delay, and trigger mode of the motion sensor
-sensitivity = pi.get_PWM_dutycycle(pir_pin)
-delay = pi.get_PWM_frequency(pir_pin)
-trigger_mode = pi.get_PWM_range(pir_pin)
+# Get the sensitivity of the motion sensor
+sensitivity = pi.read(pir_pin)
 
-# Print the sensitivity, delay, and trigger mode
-print("Sensitivity: ", sensitivity)
-print("Delay: ", delay)
-print("Trigger Mode: ", trigger_mode)
+# Set the delay and trigger mode of the motion sensor
+pi.set_PWM_dutycycle(pir_pin, 10) # Set delay to 10 seconds
+pi.set_PWM_frequency(pir_pin, 5) # Set trigger mode to repeatable
+
+# Print the sensitivity, delay, and trigger mode of the motion sensor
+print("Sensitivity: {} meters".format(sensitivity))
+print("Delay: {} seconds".format(pi.get_PWM_dutycycle(pir_pin)))
+print("Trigger mode: {}".format("repeatable" if pi.get_PWM_frequency(pir_pin) == 5 else "single"))
 
 # Loop indefinitely
 while True:
