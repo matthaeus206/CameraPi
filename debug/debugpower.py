@@ -15,8 +15,8 @@ while True:
         print("Warning: overtemperature detected!")
 
     # Check for high CPU usage
-    cpu_output = subprocess.check_output(['top', '-n', '1', '-b'])
-    cpu_usage = float(cpu_output.decode().split('Cpu(s):')[1].split('%')[0])
+    cpu_output = subprocess.check_output(['top', '-n', '1'])
+    cpu_usage = float(cpu_output.decode().split('Cpu(s):')[1].split('us')[0].strip())
     if cpu_usage > 90.0:
         print("Warning: high CPU usage detected!")
 
