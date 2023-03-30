@@ -6,8 +6,8 @@ while True:
         print("Lightning bolt symbol detected")
 
     # Check for blinking red LED
-    with open('/sys/class/leds/led1/trigger', 'r+') as trigger_file:
-        if trigger_file.read().startswith('heartbeat'):
+    with open('/sys/class/leds/led0/trigger', 'r') as trigger_file:
+        if trigger_file.read().strip() == "timer":
             print("Blinking red LED detected")
 
     # Check for instability or crashes
