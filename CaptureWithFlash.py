@@ -1,7 +1,10 @@
 import subprocess
 import time
-import RPi.GPIO as GPIO
+import pigpio
 from gpiozero import MotionSensor, DistanceSensor, LED
+
+# Initialize the pigpio instance
+pi = pigpio.pi()
 
 # Initialize the motion sensor
 pir = MotionSensor(6)
@@ -14,8 +17,7 @@ led = LED(17)
 
 # Initialize the GPIO pin for the flash
 flash_pin = 18
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(flash_pin, GPIO.OUT)
+pi.set_mode(flash_pin, pigpio.OUTPUT)
 
 # Define function to take picture and trigger flash
 def take_picture():
@@ -41,15 +43,15 @@ def take_picture():
 
         if shutter_speed < 1/300:
             # Trigger the flash at the beginning of the exposure
-            GPIO.output(flash_pin, GPIO.HIGH)
+            pi.write(flash_pin, 1)
             time.sleep(shutter_speed)
-            GPIO.output(flash_pin, GPIO.LOW)
+            pi.write(flash_pin, 0)
         else:
             # Trigger the flash near the end of the exposure
             time.sleep(shutter_speed * (299/300))
-            GPIO.output(flash_pin, GPIO.HIGH)
+            pi.write(flash_pin, 1)
             time.sleep(shutter_speed * (1/300))
-            GPIO.output(flash_pin, GPIO.LOW)
+            pi.write(flash_pin, 0)
 
         # Turn off the LED
         led.off()
@@ -65,4 +67,4 @@ if __name__ == '__main__':
     pir.close()
     ultrasonic.close()
     led.close()
-    GPIO.cleanup()
+    pi.stop()
