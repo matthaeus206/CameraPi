@@ -48,7 +48,7 @@ def take_picture():
 
         # Try to capture the image and save it on the Canon RP DSLR
         try:
-            subprocess.check_call(["gphoto2", "--capture-image-and-download", "--filename", "/store_00010001/DCIM/100CANON/%Y%m%d-%H%M%S.%C"])
+            subprocess.check_call(["gphoto2", "--capture-image-and-download", "--filename", "/store_00010001/DCIM/100CANON/%Y%m%d-%H%M%S.%C", "--set-config", "/main/settings/wakeupmode=1"])
         except subprocess.CalledProcessError as e:
             print("Could not capture image:", e)
 
@@ -90,4 +90,4 @@ if __name__ == '__main__':
         pir.close()
         ultrasonic.close()
         led.close()
-        pi.stop
+        pi.stop()
