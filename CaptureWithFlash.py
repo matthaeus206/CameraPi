@@ -22,30 +22,37 @@ pi.set_mode(flash_pin, pigpio.OUTPUT)
 # Define function to take picture and trigger flash
 def take_picture():
     while True:
+        # Wait for motion to be detected
+        pir.wait_for_motion()
+
+        # Wait for an object to be detected more than 3 inches away
+        while ultrasonic.distance <= 0.08:
+            time.sleep(0.1)
+
         # Turn on the LED
         led.on()
 
         # Try to set autofocus mode to single-shot
         try:
             subprocess.check_call(["gphoto2", "--set-config", "/main/capturesettings/afmode=0"])
-        except subprocess.CalledProcessError:
-            print("Could not set autofocus mode")
+        except subprocess.CalledProcessError as e:
+            print("Could not set autofocus mode:", e)
 
         # Try to start autofocus
         try:
             subprocess.check_call(["gphoto2", "--set-config", "/main/actions/autofocus=1"])
-        except subprocess.CalledProcessError:
-            print("Could not start autofocus")
+        except subprocess.CalledProcessError as e:
+            print("Could not start autofocus:", e)
 
         # Wait for autofocus to lock
         print("Waiting for autofocus to lock...")
         subprocess.call(["gphoto2", "--wait-event", "5s", "--event-to-stdout", "--quiet"])
 
-        # Try to trigger the camera shutter
+        # Try to trigger the camera shutter and keep the photo data in the camera only
         try:
-            subprocess.call(["gphoto2", "--trigger-capture"])
-        except subprocess.CalledProcessError:
-            print("Could not trigger camera shutter")
+            subprocess.check_call(["gphoto2", "--trigger-capture", "--keep"])
+        except subprocess.CalledProcessError as e:
+            print("Could not trigger camera shutter:", e)
 
         # Wait for the camera to start exposure
         time.sleep(0.01)
@@ -53,8 +60,8 @@ def take_picture():
         # Try to get the shutter speed
         try:
             shutter_speed = float(subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1])
-        except (subprocess.CalledProcessError, ValueError):
-            print("Could not get shutter speed")
+        except (subprocess.CalledProcessError, ValueError) as e:
+            print("Could not get shutter speed:", e)
             shutter_speed = 0
 
         if shutter_speed < 1/300:
@@ -76,11 +83,13 @@ def take_picture():
         time.sleep(1)
 
 if __name__ == '__main__':
-    # Call the take_picture function
-    take_picture()
-
-    # Clean up GPIO resources
-    pir.close()
-    ultrasonic.close()
-    led.close()
-    pi.stop()
+    try:
+        # Call the take_picture function
+        take_picture()
+    except KeyboardInterrupt:
+        # Clean up GPIO resources on keyboard interrupt
+        print("\nCleaning up GPIO resources...")
+        pir.close()
+        ultrasonic.close()
+        led.close()
+        pi.stop
