@@ -27,7 +27,7 @@ def take_picture():
 
         # Try to trigger the camera shutter
         try:
-            subprocess.call(["gphoto2", "--trigger-capture"])
+            subprocess.call(["gphoto2", "--capture-tethered"])
         except subprocess.CalledProcessError:
             print("Could not trigger camera shutter")
 
