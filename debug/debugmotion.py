@@ -1,26 +1,27 @@
 import RPi.GPIO as GPIO
 import time
+import subprocess
 
 # Set up HC-SR501 motion sensor
 pir_pin = 6
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(pir_pin, GPIO.IN)
 
-# Set up distance sensor
-# Replace the following lines with the appropriate code for your specific sensor
-distance_pin = 23
-GPIO.setup(distance_pin, GPIO.IN)
+# Set up a function to check for undervoltage
+def check_undervoltage():
+    # Run vcgencmd to check the undervoltage status
+    result = subprocess.check_output("vcgencmd get_throttled", shell=True)
+
+    # Check if the "undervoltage" bit is set in the result
+    return "0x50000" in result.decode("utf-8")
 
 while True:
     # Check for motion with HC-SR501
     if GPIO.input(pir_pin):
         print("Motion detected")
 
-    # Read distance from distance sensor
-    # Replace the following line with the appropriate code for your specific sensor
-    distance = GPIO.input(distance_pin)
-
-    # Uncomment the following line if you want to print distance as well
-    # print("Distance: {} cm".format(distance))
+    # Check for undervoltage
+    if check_undervoltage():
+        print("Undervoltage detected")
 
     time.sleep(0.1)
