@@ -1,41 +1,31 @@
 import subprocess
 import time
+import pigpio
 from gpiozero import MotionSensor
 
 # Initialize the motion sensor
 pir = MotionSensor(6)
 
-# Define function to take picture and save it on camera's SD card
+# Define function to take picture when motion is detected
 def take_picture():
-    # Define gphoto2 command to take a picture and save it on camera's SD card
-    cmd = "gphoto2 --capture-image-and-download --filename /store_00010001/DCIM/100CANON/%Y%m%d_%H%M%S.jpg"
-
     while True:
         # Wait for motion to be detected
         pir.wait_for_motion()
 
-        # Print message when motion is detected
-        print("Motion detected")
+        # Set capturetarget to 1 to save images to camera's memory card
+        subprocess.call(["gphoto2", "--set-config", "capturetarget=1"])
 
-        # Try to get the current camera settings
-        try:
-            settings = subprocess.check_output(["gphoto2", "--get-config"], stderr=subprocess.STDOUT)
-            print("Camera settings:\n", settings.decode())
-        except subprocess.CalledProcessError as e:
-            print("Could not get camera settings:", e)
+        # Capture the image and save it to camera's memory card
+        subprocess.call(["gphoto2", "--capture-image-and-download"])
 
-        # Try to take a picture and save it on the camera's SD card
-        try:
-            subprocess.check_call(cmd.split())
-            print("Picture taken and saved on camera's SD card")
-        except subprocess.CalledProcessError as e:
-            print("Could not take picture:", e)
+        # Print message indicating that image was captured and saved to camera's memory card
+        print("Image captured and saved to camera's memory card.")
 
 if __name__ == '__main__':
     try:
         # Call the take_picture function
         take_picture()
     except KeyboardInterrupt:
-        # Clean up resources on keyboard interrupt
-        print("\nCleaning up resources...")
+        # Clean up GPIO resources on keyboard interrupt
+        print("\nCleaning up GPIO resources...")
         pir.close()
