@@ -25,8 +25,8 @@ def take_picture():
         # Wait for motion to be detected
         pir.wait_for_motion()
 
-        # Wait for an object to be detected more than 3 inches away
-        while ultrasonic.distance <= 0.08:
+        # Wait for an object to be detected more than 3 cm away
+        while ultrasonic.distance <= 3:
             time.sleep(0.1)
 
         # Turn on the LED
