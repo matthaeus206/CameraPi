@@ -25,9 +25,30 @@ def take_picture():
         # Turn on the LED
         led.on()
 
+        # Try to set the camera to auto focus
+        try:
+            subprocess.call(["gphoto2", "--set-config", "autofocusdrive=1"])
+        except subprocess.CalledProcessError:
+            print("Could not set autofocus mode")
+
+        # Wait for the camera to achieve focus lock
+        while True:
+            try:
+                focus_mode = subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/afmode"]).decode('utf-8').split(" ")[-1].strip()
+                if focus_mode == "Manual":
+                    print("Camera set to manual focus")
+                    break
+                focus_lock = subprocess.check_output(["gphoto2", "--get-config", "/main/status/focusstatus"]).decode('utf-8').split(" ")[-1].strip()
+                if focus_lock == "Locked":
+                    print("Focus lock acquired")
+                    break
+            except subprocess.CalledProcessError:
+                print("Could not get focus status")
+            time.sleep(0.5)
+
         # Try to trigger the camera shutter
         try:
-            subprocess.call(["gphoto2", "--capture-tethered"])
+            subprocess.call(["gphoto2", "--trigger-capture"])
         except subprocess.CalledProcessError:
             print("Could not trigger camera shutter")
 
