@@ -24,4 +24,4 @@ while True:
     if check_undervoltage():
         print("Undervoltage detected")
 
-    time.sleep(0.1)
+    time.sleep(1)
