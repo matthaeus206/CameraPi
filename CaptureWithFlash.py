@@ -46,11 +46,11 @@ def take_picture():
         print("Waiting for autofocus to lock...")
         subprocess.call(["gphoto2", "--wait-event", "5s", "--event-to-stdout", "--quiet"])
 
-        # Try to trigger the camera shutter and keep the photo data in the camera only
+        # Try to capture the image and save it on the Canon RP DSLR
         try:
-            subprocess.check_call(["gphoto2", "--trigger-capture", "--keep"])
+            subprocess.check_call(["gphoto2", "--capture-image-and-download", "--filename", "/store_00010001/DCIM/100CANON/%Y%m%d-%H%M%S.%C"])
         except subprocess.CalledProcessError as e:
-            print("Could not trigger camera shutter:", e)
+            print("Could not capture image:", e)
 
         # Wait for the camera to start exposure
         time.sleep(0.01)
@@ -77,8 +77,8 @@ def take_picture():
         # Turn off the LED
         led.off()
 
-        # Wait for one second before taking the next picture
-        time.sleep(1)
+        # Wait for 5 seconds before taking the next picture
+        time.sleep(5)
 
 if __name__ == '__main__':
     try:
