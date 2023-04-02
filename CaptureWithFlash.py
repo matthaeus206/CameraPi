@@ -25,10 +25,10 @@ def take_picture():
         # Wait for motion to be detected
         pir.wait_for_motion()
 
-        # *********** Distance sensor requirements removed ***********
-
         # Turn on the LED
         led.on()
+
+        # *********** Distance sensor requirements removed ***********
 
         # Try to set autofocus mode to single-shot
         try:
