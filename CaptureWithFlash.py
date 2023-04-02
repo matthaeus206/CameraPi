@@ -1,16 +1,13 @@
 import subprocess
 import time
 import pigpio
-from gpiozero import MotionSensor, DistanceSensor, LED
+from gpiozero import MotionSensor, LED
 
 # Initialize the pigpio instance
 pi = pigpio.pi()
 
 # Initialize the motion sensor
 pir = MotionSensor(6)
-
-# Initialize the ultrasonic sensor minimum recharge time is 0.5sec
-ultrasonic = DistanceSensor(echo=4, trigger=5)
 
 # Initialize the LED
 led = LED(17)
@@ -27,8 +24,6 @@ def take_picture():
 
         # Turn on the LED
         led.on()
-
-        # *********** Distance sensor requirements removed ***********
 
         # Try to set autofocus mode to single-shot
         try:
@@ -88,6 +83,5 @@ if __name__ == '__main__':
         # Clean up GPIO resources on keyboard interrupt
         print("\nCleaning up GPIO resources...")
         pir.close()
-        ultrasonic.close()
         led.close()
         pi.stop()
