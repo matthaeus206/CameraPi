@@ -25,6 +25,7 @@ def take_picture():
         # Turn on the LED
         led.on()
 
+        """
         # Try to set autofocus mode to single-shot
         try:
             subprocess.check_call(["gphoto2", "--set-config", "/main/capturesettings/afmode=0"])
@@ -40,6 +41,7 @@ def take_picture():
         # Wait for autofocus to lock
         print("Waiting for autofocus to lock...")
         subprocess.call(["gphoto2", "--wait-event", "5s", "--event-to-stdout", "--quiet"])
+        """
 
         # Press the shutter button fully to take the picture
         try:
@@ -52,8 +54,7 @@ def take_picture():
 
         # Try to get the shutter speed
         try:
-            shutter_speed_output = subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1]
-            shutter_speed = float(shutter_speed_output.strip().split('/')[0]) / float(shutter_speed_output.strip().split('/')[1])
+            shutter_speed = float(subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1])
         except (subprocess.CalledProcessError, ValueError) as e:
             print("Could not get shutter speed:", e)
             shutter_speed = 0
@@ -73,8 +74,8 @@ def take_picture():
         # Turn off the LED
         led.off()
 
-        # Wait for 1 second before taking the next picture
-        time.sleep(1)
+        # Wait for 5 seconds before taking the next picture
+        time.sleep(5)
 
 if __name__ == '__main__':
     try:
