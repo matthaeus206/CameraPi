@@ -52,7 +52,8 @@ def take_picture():
 
         # Try to get the shutter speed
         try:
-            shutter_speed = float(subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1])
+            shutter_speed_output = subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1]
+            shutter_speed = float(shutter_speed_output.strip().split('/')[0]) / float(shutter_speed_output.strip().split('/')[1])
         except (subprocess.CalledProcessError, ValueError) as e:
             print("Could not get shutter speed:", e)
             shutter_speed = 0
