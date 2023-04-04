@@ -26,9 +26,9 @@ try:
         # Take a photo if motion is detected
         if pir.motion_detected:
             try:
-                subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Immediate"])
-                subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Release Full"])
-                subprocess.check_call(["gphoto2", "--wait-event-and-download=FILEADDED", "--raw"])
+            subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Immediate"])
+            subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Release Full"])
+            subprocess.check_call(["gphoto2", "--wait-event-and-download=FILEADDED", "--raw", "--force-overwrite"])
                 print("Photo taken")
             except subprocess.CalledProcessError as e:
                 print("Could not take photo:", e)
