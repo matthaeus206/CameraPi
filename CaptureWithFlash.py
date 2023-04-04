@@ -16,29 +16,37 @@ led = LED(17)
 flash_pin = 18
 pi.set_mode(flash_pin, pigpio.OUTPUT)
 
+# Wait for motion
+pir.wait_for_motion()
+print("Motion detected")
+led.on()
+
 try:
     while True:
-        pir.wait_for_motion()
-        print("Motion detected")
-        led.on()
-        
-        # Take a photo
-        try:
-            subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Immediate"])
-            subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Release Full"])
-            subprocess.check_call(["gphoto2", "--wait-event-and-download=FILEADDED"])
-            print("Photo taken")
-        except subprocess.CalledProcessError as e:
-            print("Could not take photo:", e)
-            
-        # Trigger the flash
-        pi.write(flash_pin, 1)
-        time.sleep(0.01)
-        pi.write(flash_pin, 0)
+        # Take a photo if motion is detected
+        if pir.motion_detected:
+            try:
+                subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Immediate"])
+                subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Release Full"])
+                subprocess.check_call(["gphoto2", "--wait-event-and-download=FILEADDED"])
+                print("Photo taken")
+            except subprocess.CalledProcessError as e:
+                print("Could not take photo:", e)
+                
+            # Trigger the flash
+            pi.write(flash_pin, 1)
+            time.sleep(0.01)
+            pi.write(flash_pin, 0)
 
+        # Wait for motion to stop
         pir.wait_for_no_motion()
         print("Motion stopped")
         led.off()
+
+        # Wait for motion to start again
+        pir.wait_for_motion()
+        print("Motion detected")
+        led.on()
 
 finally:
     # Clean up resources
