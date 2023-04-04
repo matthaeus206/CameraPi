@@ -19,6 +19,9 @@ def get_distance():
     pulse_start = time.time()
     while GPIO.input(echo_pin) == 0:
         pulse_start = time.time()
+        if pulse_start - time.time() > 0.1:  # If the sensor is not detected for 0.1 seconds, print a message
+            print("Sensor not detected!")
+            return None
 
     pulse_end = time.time()
     while GPIO.input(echo_pin) == 1:
@@ -34,5 +37,6 @@ def get_distance():
 
 while True:
     distance = get_distance()
-    print("Distance: {} cm".format(distance))
+    if distance is not None:
+        print("Distance: {} cm".format(distance))
     time.sleep(0.1)
