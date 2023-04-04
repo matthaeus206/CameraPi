@@ -1,11 +1,11 @@
+import pigpio
 import subprocess
 import time
-import pigpio
 from gpiozero import LED, MotionSensor
 
-# Set up the camera
-subprocess.call(["gphoto2", "--set-config", "eosremoterelease=Immediate"])
-subprocess.call(["gphoto2", "--set-config", "eosremoterelease=Release Full"])
+# Set up camera for immediate capture
+subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Immediate"])
+subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Release Full"])
 
 # Initialize the pigpio instance
 pi = pigpio.pi()
@@ -21,10 +21,10 @@ flash_pin = 18
 pi.set_mode(flash_pin, pigpio.OUTPUT)
 
 while True:
-    # Wait for motion
+    # Wait for motion to be detected
     pir.wait_for_motion()
 
-    # Turn on the LED
+    # Light up LED
     led.on()
 
     # Trigger the flash
@@ -32,20 +32,17 @@ while True:
     time.sleep(0.01)
     pi.write(flash_pin, 0)
 
-    # Take a picture
+    # Take a photo
     try:
-        subprocess.check_call(["gphoto2", "--capture-image"])
+        subprocess.check_call(["gphoto2", "--capture-image-and-download"])
         print("Photo taken")
     except subprocess.CalledProcessError as e:
-        print("Could not take picture:", e)
+        print("Could not take photo:", e)
 
     # Wait for motion to stop
     pir.wait_for_no_motion()
 
-    # Turn off the LED
+    # Turn off LED
     led.off()
 
-# Clean up the resources
-pir.close()
-led.close()
-pi.stop()
+    print("Motion stopped")
