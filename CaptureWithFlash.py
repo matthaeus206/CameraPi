@@ -28,7 +28,7 @@ try:
             try:
                 subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Immediate"])
                 subprocess.check_call(["gphoto2", "--set-config", "eosremoterelease=Release Full"])
-                subprocess.check_call(["gphoto2", "--wait-event-and-download=FILEADDED"])
+                subprocess.check_call(["gphoto2", "--wait-event-and-download=FILEADDED", "--raw"])
                 print("Photo taken")
             except subprocess.CalledProcessError as e:
                 print("Could not take photo:", e)
