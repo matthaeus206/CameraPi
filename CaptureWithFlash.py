@@ -25,7 +25,6 @@ def take_picture():
         # Turn on the LED
         led.on()
 
-        """
         # Try to set autofocus mode to single-shot
         try:
             subprocess.check_call(["gphoto2", "--set-config", "/main/capturesettings/afmode=0"])
@@ -41,7 +40,6 @@ def take_picture():
         # Wait for autofocus to lock
         print("Waiting for autofocus to lock...")
         subprocess.call(["gphoto2", "--wait-event", "5s", "--event-to-stdout", "--quiet"])
-        """
 
         # Press the shutter button fully to take the picture
         try:
@@ -52,24 +50,10 @@ def take_picture():
         # Wait for the camera to start exposure
         time.sleep(0.01)
 
-        # Try to get the shutter speed
-        try:
-            shutter_speed = float(subprocess.check_output(["gphoto2", "--get-config", "/main/capturesettings/shutterspeed"]).decode('utf-8').split(" ")[-1])
-        except (subprocess.CalledProcessError, ValueError) as e:
-            print("Could not get shutter speed:", e)
-            shutter_speed = 0
-
-        if shutter_speed < 1/300:
-            # Trigger the flash at the beginning of the exposure
-            pi.write(flash_pin, 1)
-            time.sleep(shutter_speed)
-            pi.write(flash_pin, 0)
-        else:
-            # Trigger the flash near the end of the exposure
-            time.sleep(shutter_speed * (299/300))
-            pi.write(flash_pin, 1)
-            time.sleep(shutter_speed * (1/300))
-            pi.write(flash_pin, 0)
+        # Trigger the flash
+        pi.write(flash_pin, 1)
+        time.sleep(0.01)
+        pi.write(flash_pin, 0)
 
         # Turn off the LED
         led.off()
