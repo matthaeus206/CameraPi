@@ -58,9 +58,6 @@ def take_picture():
         # Turn off the LED
         led.off()
 
-        # Wait for 5 seconds before taking the next picture
-        time.sleep(5)
-
 if __name__ == '__main__':
     try:
         # Call the take_picture function
