@@ -1,7 +1,7 @@
 import subprocess
 import time
 import pigpio
-from gpiozero import MotionSensor, LED
+from gpiozero import LED, MotionSensor
 
 # Set up the camera
 subprocess.call(["gphoto2", "--set-config", "eosremoterelease=Immediate"])
@@ -20,36 +20,32 @@ led = LED(17)
 flash_pin = 18
 pi.set_mode(flash_pin, pigpio.OUTPUT)
 
-# Wait for 10 seconds before starting the loop
-print("Waiting for 10 seconds...")
-time.sleep(10)
-
-# Start the loop
-print("Starting the loop...")
 while True:
-    if pir.motion_detected:
-        # Turn on the LED
-        led.on()
+    # Wait for motion
+    pir.wait_for_motion()
 
-        # Trigger the flash
-        pi.write(flash_pin, 1)
-        time.sleep(0.01)
-        pi.write(flash_pin, 0)
+    # Turn on the LED
+    led.on()
 
-        # Take a photo
-        print("Taking photo...")
-        try:
-            subprocess.check_call(["gphoto2", "--capture-image-and-download"])
-            print("Photo taken")
-        except subprocess.CalledProcessError as e:
-            print("Could not take photo:", e)
+    # Trigger the flash
+    pi.write(flash_pin, 1)
+    time.sleep(0.01)
+    pi.write(flash_pin, 0)
 
-        # Wait for 5 seconds before checking for motion again
-        time.sleep(5)
+    # Take a picture
+    try:
+        subprocess.check_call(["gphoto2", "--capture-image"])
+        print("Photo taken")
+    except subprocess.CalledProcessError as e:
+        print("Could not take picture:", e)
 
-    else:
-        # Turn off the LED
-        led.off()
+    # Wait for motion to stop
+    pir.wait_for_no_motion()
 
-        # Wait for 1 second before checking for motion again
-        time.sleep(1)
+    # Turn off the LED
+    led.off()
+
+# Clean up the resources
+pir.close()
+led.close()
+pi.stop()
