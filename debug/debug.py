@@ -9,9 +9,10 @@ while True:
     print("4. Test HC-SR501 motion sensor")
     print("5. Test undervoltage")
     print("6. Test camera trigger")
+    print("7. Test Temps")
     print("0. Exit")
 
-    choice = input("Enter your choice (0-6): ")
+    choice = input("Enter your choice (0-7): ")
 
     # Run selected debug script
     if choice == "1":
@@ -26,5 +27,7 @@ while True:
         os.system("python3 debugpower.py")
     elif choice == "6":
         os.system("python3 debugtransistors.py")
+    elif choice == "7":
+        os.system("python3 debugtemp.py")
     elif choice == "0":
         break
