@@ -11,18 +11,22 @@ ECHO_PIN = 24
 CAM_HALF_PRESS_PIN = 18
 CAM_FULL_PRESS_PIN = 25
 
+# Define GPIO pin for flash
+FLASH_PIN = 17
+
 # Set up GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(TRIG_PIN, GPIO.OUT)
 GPIO.setup(ECHO_PIN, GPIO.IN)
 GPIO.setup(CAM_HALF_PRESS_PIN, GPIO.OUT)
 GPIO.setup(CAM_FULL_PRESS_PIN, GPIO.OUT)
+GPIO.setup(FLASH_PIN, GPIO.OUT)
 
 # Initialize the motion sensor
 pir = MotionSensor(6)
 
 # Initialize the LED
-led = LED(17)
+led = LED(27)
 
 # Wait for motion
 pir.wait_for_motion()
@@ -65,6 +69,11 @@ try:
                 time.sleep(5)
 
                 print("Photo taken")
+
+                # Trigger the flash
+                GPIO.output(FLASH_PIN, GPIO.HIGH)
+                time.sleep(0.01)
+                GPIO.output(FLASH_PIN, GPIO.LOW)
             except Exception as e:
                 print("Could not take photo:", e)
 
@@ -80,6 +89,6 @@ try:
 
 finally:
     # Clean up resources
-    GPIO.cleanup()
+    GPIO.cleanup([TRIG_PIN, ECHO_PIN, CAM_HALF_PRESS_PIN, CAM_FULL_PRESS_PIN, FLASH_PIN])
     pir.close()
     led.close()
