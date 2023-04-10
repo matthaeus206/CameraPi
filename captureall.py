@@ -3,19 +3,25 @@ from gpiozero import MotionSensor, LED
 import subprocess
 import time
 
-# Set up the GPIO pins
-GPIO.setmode(GPIO.BCM)
-PIR_PIN = 6
-FLASH_PIN = 18
-HALF_PRESS_PIN = 23
-FULL_PRESS_PIN = 24
-GPIO.setup(PIR_PIN, GPIO.IN)
-GPIO.setup(FLASH_PIN, GPIO.OUT)
-GPIO.setup(HALF_PRESS_PIN, GPIO.OUT)
-GPIO.setup(FULL_PRESS_PIN, GPIO.OUT)
+# Define GPIO pins for HC-SR04
+TRIG_PIN = 23
+ECHO_PIN = 24
 
-# Initialize the motion sensor and LED
-pir = MotionSensor(PIR_PIN)
+# Define GPIO pins for camera
+CAM_HALF_PRESS_PIN = 18
+CAM_FULL_PRESS_PIN = 25
+
+# Set up GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(TRIG_PIN, GPIO.OUT)
+GPIO.setup(ECHO_PIN, GPIO.IN)
+GPIO.setup(CAM_HALF_PRESS_PIN, GPIO.OUT)
+GPIO.setup(CAM_FULL_PRESS_PIN, GPIO.OUT)
+
+# Initialize the motion sensor
+pir = MotionSensor(6)
+
+# Initialize the LED
 led = LED(17)
 
 # Wait for motion
@@ -25,28 +31,42 @@ led.on()
 
 try:
     while True:
-        # Take a photo if motion is detected
-        if pir.motion_detected:
+        # Measure distance with HC-SR04
+        GPIO.output(TRIG_PIN, GPIO.HIGH)
+        time.sleep(0.00001)
+        GPIO.output(TRIG_PIN, GPIO.LOW)
+        pulse_start = time.time()
+        while GPIO.input(ECHO_PIN) == GPIO.LOW:
+            pulse_start = time.time()
+        pulse_end = time.time()
+        while GPIO.input(ECHO_PIN) == GPIO.HIGH:
+            pulse_end = time.time()
+        pulse_duration = pulse_end - pulse_start
+        distance = pulse_duration * 17150
+        distance = round(distance, 2)
+        
+        # Take a photo if motion is detected and distance is within range
+        if pir.motion_detected and 0.3 <= distance <= 7:
             try:
                 # Half-press the camera button
-                GPIO.output(HALF_PRESS_PIN, GPIO.HIGH)
+                GPIO.output(CAM_HALF_PRESS_PIN, GPIO.HIGH)
+                time.sleep(0.5)
+                GPIO.output(CAM_HALF_PRESS_PIN, GPIO.LOW)
+
+                # Wait for autofocus to complete
                 time.sleep(1)
 
-                # Full-press the camera button to take the photo
-                GPIO.output(FULL_PRESS_PIN, GPIO.HIGH)
+                # Full-press the camera button
+                GPIO.output(CAM_FULL_PRESS_PIN, GPIO.HIGH)
                 time.sleep(0.5)
-                GPIO.output(FULL_PRESS_PIN, GPIO.LOW)
+                GPIO.output(CAM_FULL_PRESS_PIN, GPIO.LOW)
 
-                # Release the camera button
-                GPIO.output(HALF_PRESS_PIN, GPIO.LOW)
-                time.sleep(0.5)
+                # Wait for photo to be taken
+                time.sleep(5)
+
+                print("Photo taken")
             except Exception as e:
                 print("Could not take photo:", e)
-
-            # Trigger the flash
-            GPIO.output(FLASH_PIN, GPIO.HIGH)
-            time.sleep(0.01)
-            GPIO.output(FLASH_PIN, GPIO.LOW)
 
         # Wait for motion to stop
         pir.wait_for_no_motion()
@@ -60,6 +80,6 @@ try:
 
 finally:
     # Clean up resources
+    GPIO.cleanup()
     pir.close()
     led.close()
-    GPIO.cleanup()
