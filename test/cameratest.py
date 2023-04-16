@@ -1,42 +1,32 @@
 import RPi.GPIO as GPIO
 import time
 
-# Set up GPIO pins
+# Set the GPIO mode to BCM
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(17, GPIO.OUT)
-GPIO.setup(18, GPIO.OUT)
-GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# Define half-press and full-press durations
-HALF_PRESS_DURATION = 0.2
-FULL_PRESS_DURATION = 0.5
+# Set the GPIO pins for the half-press and full-press events
+half_press_pin = 17
+full_press_pin = 4
 
-# Function to simulate half-press event
+# Set the GPIO pins as outputs
+GPIO.setup(half_press_pin, GPIO.OUT)
+GPIO.setup(full_press_pin, GPIO.OUT)
+
+# Define a function to simulate a half-press event
 def half_press():
-    # Simulate half-press by turning on the half-press transistor for a short duration
-    GPIO.output(17, GPIO.HIGH)
-    time.sleep(HALF_PRESS_DURATION)
-    GPIO.output(17, GPIO.LOW)
+    GPIO.output(half_press_pin, GPIO.HIGH)
+    time.sleep(0.5) # adjust the duration as needed
+    GPIO.output(half_press_pin, GPIO.LOW)
 
-# Function to simulate full-press event
+# Define a function to simulate a full-press event
 def full_press():
-    # Simulate full-press by turning on the full-press transistor for a longer duration
-    GPIO.output(18, GPIO.HIGH)
-    time.sleep(FULL_PRESS_DURATION)
-    GPIO.output(18, GPIO.LOW)
+    GPIO.output(full_press_pin, GPIO.HIGH)
+    time.sleep(0.5) # adjust the duration as needed
+    GPIO.output(full_press_pin, GPIO.LOW)
 
-# Main loop
-try:
-    while True:
-        # Wait for button press
-        GPIO.wait_for_edge(27, GPIO.FALLING)
-
-        # Determine whether to do a half-press or full-press
-        if GPIO.input(27):
-            full_press()
-        else:
-            half_press()
-
-except KeyboardInterrupt:
-    # Clean up the GPIO pins
-    GPIO.cleanup()
+# Flash the camera every 5 seconds using a loop
+while True:
+    half_press() # simulate a half-press event to focus
+    time.sleep(1) # wait for the camera to focus
+    full_press() # simulate a full-press event to take the photo
+    time.sleep(5) # wait for 5 seconds before repeating
