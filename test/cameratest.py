@@ -2,8 +2,8 @@ import RPi.GPIO as GPIO
 import time
 
 # Define the GPIO pins
-half_press_pin = 4
-full_press_pin = 17
+half_press_pin = 17
+full_press_pin = 4
 
 # Set the GPIO mode to BCM
 GPIO.setmode(GPIO.BCM)
