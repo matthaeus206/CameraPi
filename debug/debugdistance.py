@@ -2,8 +2,8 @@ import RPi.GPIO as GPIO
 import time
 
 # Set up HC-SR04 distance sensor
-trig_pin = 4
-echo_pin = 5
+trig_pin = 18
+echo_pin = 17
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(trig_pin, GPIO.OUT)
 GPIO.setup(echo_pin, GPIO.IN)
