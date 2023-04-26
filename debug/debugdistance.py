@@ -35,8 +35,15 @@ def get_distance():
 
     return distance
 
-while True:
-    distance = get_distance()
-    if distance is not None:
-        print("Distance: {} cm".format(distance))
-    time.sleep(0.1)
+last_measurement_time = time.time()
+try:
+    while True:
+        distance = get_distance()
+        if distance is not None and time.time() - last_measurement_time >= 2:
+            print("Distance: {} cm".format(distance))
+            last_measurement_time = time.time()
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    pass
+finally:
+    GPIO.cleanup()
