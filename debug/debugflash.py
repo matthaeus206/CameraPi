@@ -2,21 +2,21 @@ import RPi.GPIO as GPIO
 import time
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(4, GPIO.OUT)  # set up GPIO pin 4 as an output for the signal to the transistor base
+GPIO.setup(4, GPIO.OUT)  # set up GPIO pin 4 as an output
+GPIO.setup(5, GPIO.OUT)  # set up GPIO pin 5 as an output
 
 try:
     while True:
+        # turn on pin 4 and turn off pin 5
         GPIO.output(4, GPIO.HIGH)
-        time.sleep(0.1)  # adjust this delay as necessary for your camera
-        GPIO.output(4, GPIO.LOW)
-        time.sleep(0.1)  # adjust this delay as necessary for your camera
+        GPIO.output(5, GPIO.LOW)
+        time.sleep(5)
 
-        # Trigger the camera by applying a signal to the base of the transistor on GPIO pin 4
-        GPIO.output(4, GPIO.HIGH)
-        time.sleep(0.1)  # adjust this delay as necessary for your camera
+        # turn off pin 4 and turn on pin 5
         GPIO.output(4, GPIO.LOW)
-        time.sleep(5)  # adjust this delay as necessary for your camera
+        GPIO.output(5, GPIO.HIGH)
+        time.sleep(5)
 
 except KeyboardInterrupt:
-    # Clean up GPIO pin 4 and exit gracefully on Ctrl+C
-    GPIO.cleanup(4)
+    # Clean up GPIO pins and exit gracefully on Ctrl+C
+    GPIO.cleanup([4, 5])
