@@ -1,16 +1,12 @@
 # Import necessary modules
-import RPi.GPIO as GPIO
+import machine
+from machine import Pin
 from gpiozero import MotionSensor, DistanceSensor
 from time import sleep
 
-# Set up GPIO numbering mode
-GPIO.setmode(GPIO.BCM)
-
 # Set up GPIO pins for the transistors
-flash_pin = 4
-shutter_pin = 5
-GPIO.setup(flash_pin, GPIO.OUT)
-GPIO.setup(shutter_pin, GPIO.OUT)
+flash_pin = Pin(4, Pin.OUT)
+shutter_pin = Pin(5, Pin.OUT)
 
 # Initialize the motion and distance sensors
 pir = MotionSensor(6)
@@ -19,13 +15,13 @@ ultrasonic = DistanceSensor(echo=16, trigger=17, max_distance=100, queue_len=2)
 # Define a function to trigger the flash and shutter release
 def trigger_camera():
     # Trigger flash
-    GPIO.output(flash_pin, GPIO.HIGH)
+    flash_pin.value(1)
     sleep(1.2)
-    GPIO.output(flash_pin, GPIO.LOW)
+    flash_pin.value(0)
     # Trigger shutter release
-    GPIO.output(shutter_pin, GPIO.HIGH)
+    shutter_pin.value(1)
     sleep(0.1)
-    GPIO.output(shutter_pin, GPIO.LOW)
+    shutter_pin.value(0)
 
 # Continuously monitor the sensors and trigger the transistors when conditions are met
 while True:
