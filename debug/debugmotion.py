@@ -3,7 +3,7 @@ import time
 import subprocess
 
 # Set up HC-SR501 motion sensor
-pir_pin = 4
+pir_pin = 6
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(pir_pin, GPIO.IN)
 
