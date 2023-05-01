@@ -1,4 +1,3 @@
-# Import necessary modules
 import machine
 from machine import Pin
 from gpiozero import MotionSensor, DistanceSensor
@@ -23,8 +22,12 @@ def trigger_camera():
     sleep(0.1)
     shutter_pin.value(0)
 
-# Continuously monitor the sensors and trigger the transistors when conditions are met
-while True:
-    if pir.motion_detected and ultrasonic.distance > 0.254:  # 10 inches in meters
-        trigger_camera()
-    sleep(0.1)  # Sleep for 100ms between sensor readings
+# Define a function to continuously monitor the sensors and trigger the transistors when conditions are met
+def monitor_sensors():
+    while True:
+        if pir.motion_detected and ultrasonic.distance > 0.254:  # 10 inches in meters
+            trigger_camera()
+        sleep(0.1)  # Sleep for 100ms between sensor readings
+
+# Call the function to monitor the sensors and trigger the transistors
+monitor_sensors()
