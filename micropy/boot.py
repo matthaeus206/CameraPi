@@ -5,6 +5,7 @@ import time
 
 flash_pin = digitalio.DigitalInOut(board.GP9)
 flash_pin.direction = digitalio.Direction.OUTPUT
+
 shutter_pin = digitalio.DigitalInOut(board.GP10)
 shutter_pin.direction = digitalio.Direction.OUTPUT
 
@@ -16,3 +17,4 @@ while True:
     time.sleep(0.1)
     shutter_pin.value = False
     time.sleep(0.1)
+
