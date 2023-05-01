@@ -16,4 +16,3 @@ while True:
     time.sleep(0.1)
     shutter_pin.value = False
     time.sleep(0.1)
-
