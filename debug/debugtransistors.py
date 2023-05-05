@@ -1,44 +1,46 @@
-import RPi.GPIO as GPIO
 import time
+import board
+import digitalio
 
-# Set up GPIO pins
-flash_pin = 18
-half_press_pin = 23
-full_press_pin = 24
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(flash_pin, GPIO.OUT)
-GPIO.setup(half_press_pin, GPIO.OUT)
-GPIO.setup(full_press_pin, GPIO.OUT)
+# Set up motion sensor
+pir = digitalio.DigitalInOut(board.GP6)
+pir.direction = digitalio.Direction.INPUT
 
-try:
-    # Display menu prompt
-    print("Which transistor do you want to test?")
-    print("1. Flash transistor")
-    print("2. Half press transistor")
-    print("3. Full press transistor")
-    choice = int(input("Enter your choice (1-3): "))
+# Set up transistors to trigger flash
+flash1 = digitalio.DigitalInOut(board.GP5)
+flash1.direction = digitalio.Direction.OUTPUT
+flash1.value = False
 
-    # Test selected transistor
-    if choice == 1:
-        print("Testing flash transistor...")
-        GPIO.output(flash_pin, True)
-        time.sleep(0.5)
-        GPIO.output(flash_pin, False)
-        print("Flash transistor test complete!")
-    elif choice == 2:
-        print("Testing half press transistor...")
-        GPIO.output(half_press_pin, True)
-        time.sleep(0.5)
-        GPIO.output(half_press_pin, False)
-        print("Half press transistor test complete!")
-    elif choice == 3:
-        print("Testing full press transistor...")
-        GPIO.output(full_press_pin, True)
-        time.sleep(0.5)
-        GPIO.output(full_press_pin, False)
-        print("Full press transistor test complete!")
-    else:
-        print("Invalid choice. Please enter a number between 1 and 3.")
+flash2 = digitalio.DigitalInOut(board.GP7)
+flash2.direction = digitalio.Direction.OUTPUT
+flash2.value = False
 
-except KeyboardInterrupt:
-    GPIO.cleanup()
+# Set initial time for triggering flash
+flash_time = time.monotonic()
+
+while True:
+    if pir.value:
+        print("Motion detected!")
+        if time.monotonic() - flash_time >= 1:
+            flash1.value = True
+            flash2.value = True
+            time.sleep(0.1)
+            flash1.value = False
+            flash2.value = False
+            # Update flash time
+            flash_time = time.monotonic()
+    time.sleep(0.1)
+
+    # Clean up pins
+    pir.deinit()
+    flash1.deinit()
+    flash2.deinit()
+    time.sleep(0.1)
+    pir = digitalio.DigitalInOut(board.GP6)
+    pir.direction = digitalio.Direction.INPUT
+    flash1 = digitalio.DigitalInOut(board.GP5)
+    flash1.direction = digitalio.Direction.OUTPUT
+    flash1.value = False
+    flash2 = digitalio.DigitalInOut(board.GP7)
+    flash2.direction = digitalio.Direction.OUTPUT
+    flash2.value = False
