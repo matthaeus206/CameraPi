@@ -1,33 +1,36 @@
+import time
 import board
 import digitalio
-# import adafruit_hcsr04  # Commenting out this line
-import time
 
-# Set up GPIO pins for the transistors
-flash_pin = digitalio.DigitalInOut(board.D4)
-flash_pin.direction = digitalio.Direction.OUTPUT
-shutter_pin = digitalio.DigitalInOut(board.D5)
-shutter_pin.direction = digitalio.Direction.OUTPUT
+# Set up HC-SR501 PIR Infrared Motion Sensor
+pir_sensor = digitalio.DigitalInOut(board.GP6)
+pir_sensor.direction = digitalio.Direction.INPUT
 
-# Initialize the motion and distance sensors
-pir = digitalio.DigitalInOut(board.D6)
-pir.direction = digitalio.Direction.INPUT
-pir.pull = digitalio.Pull.UP
-# ultrasonic = adafruit_hcsr04.HCSR04(trigger_pin=board.D17, echo_pin=board.D16)  # Commenting out this line
+# Set up flash trigger transistor
+flash_trigger = digitalio.DigitalInOut(board.GP7)
+flash_trigger.direction = digitalio.Direction.OUTPUT
 
-# Define a function to trigger the flash and shutter release
-def trigger_camera():
-    # Trigger flash
-    flash_pin.value = True
-    time.sleep(1.2)
-    flash_pin.value = False
-    # Trigger shutter release
-    shutter_pin.value = True
-    time.sleep(0.1)
-    shutter_pin.value = False
+# Set up camera trigger transistor
+camera_trigger = digitalio.DigitalInOut(board.GP5)
+camera_trigger.direction = digitalio.Direction.OUTPUT
 
-# Continuously monitor the sensors and trigger the transistors when conditions are met
+# Main loop
 while True:
-    if pir.value:  # Commenting out the condition related to the distance sensor
-        trigger_camera()
-    time.sleep(0.1)  # Sleep for 100ms between sensor readings
+    try:
+        # Check for motion
+        if pir_sensor.value:
+            # Trigger flash
+            flash_trigger.value = True
+            time.sleep(0.1)
+            flash_trigger.value = False
+
+            # Trigger camera 
+            camera_trigger.value = True
+            time.sleep(0.1)
+            camera_trigger.value = False
+
+            # Wait for cooldown
+            time.sleep(1)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        # Log error or take corrective action
