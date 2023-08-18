@@ -1,0 +1,30 @@
+Materials List:
+
+- 1x HC-SR501 PIR Infrared Motion Sensor
+- 1x Hobby Case for containing parts.
+- 1x RP2040-Zero
+- 2x 2n3904 Transistors
+- 2x 10kΩ Resistors (for 2n3904 base current limiting)
+- 1x PCB Board
+- 1x 2.5mm to Bare Wire Female Plug
+- 1x 3.5mm to Bare Wire Female Plug
+- Wires and Jumpers for Connections
+- Power Supply (if needed)
+- Breadboard (if prototyping)
+- Soldering Iron and Solder (if soldering is required)
+
+- Mounting Hardware (screws, standoffs, etc.)
+- 1x USB-C Male to USB-A Female Connector
+
+Optional Components:
+- Capacitors for Decoupling (if recommended by the RP2040-Zero datasheet)
+- Additional Sensors (such as temperature, light, etc.)
+- LEDs and Appropriate Resistors for Indication
+- Buttons or Switches (if user interaction is desired)
+- Enclosure or Casing (if permanent housing is needed)
+- External Components for Specific Project Requirements (e.g., display modules, audio components, etc.)
+
+Note: 
+The components listed above are based on the provided information. 
+Make sure to refer to the datasheets and specifications for each component to ensure proper integration and functionality. 
+The resistor values are provided assuming standard usage for 2n3904 transistors; adjust them as needed for your specific circuit requirements.
