@@ -1,0 +1,54 @@
+# PIR Motion Sensor with RP2040-Zero and CircuitPython
+
+This project uses a PIR motion sensor to trigger a flash and camera when motion is detected.
+
+## Materials
+
+* 1x HC-SR501 PIR Infrared Motion Sensor
+* 1x Hobby Case for containing parts.
+* 1x Waveshare RP2040-Zero
+* 2x 2n3904 Transistors
+* 2x 10kΩ Resistors (for 2n3904 base current limiting)
+* 1x PCB Board
+* 1x 2.5mm to Bare Wire Female Plug
+* 1x 3.5mm to Bare Wire Female Plug
+* Wires and Jumpers for Connections
+* Power Supply (if needed)
+* Breadboard (if prototyping)
+* Soldering Iron and Solder (if soldering is required)
+* Header Pins and Connectors (if needed)
+* Heat Shrink Tubing or Insulation for Wire Connections (if needed)
+* Mounting Hardware (screws, standoffs, etc.)
+* 1x USB-C Male to USB-A Female Connector
+
+## Documentation
+
+* [RP2040-Zero documentation](https://www.waveshare.com/rp2040-zero.htm)
+* [CircuitPython documentation](https://docs.circuitpython.org/en/latest/docs/index.html)
+
+## Instructions
+
+1. Set up the voltage divider circuit for the HC-SR501.
+2. Connect the PIR sensor to the RP2040-Zero using the following pin numbers:
+    * PIR sensor OUT pin to GP6
+    * PIR sensor VCC pin to 3V3
+    * PIR sensor GND pin to GND
+3. Connect the flash and camera to the RP2040-Zero using the following pin numbers:
+    * Flash trigger pin to GP7
+    * Camera trigger pin to GP5
+4. Upload the code to the RP2040-Zero.
+5. Power on the circuit.
+
+## Code
+
+The code for this project is available in the `code` directory.
+
+## Credits
+
+This project was inspired by the following tutorial:
+
+* https://learn.adafruit.com/pir-motion-sensor-with-raspberry-pi/overview
+
+## License
+
+This project is licensed under the GNU General Public License v3.0.
